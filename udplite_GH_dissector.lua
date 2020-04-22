@@ -4,15 +4,10 @@ message_length = ProtoField.int32("greenhouse.message_length", "messageLength", 
 
 date = ProtoField.absolute_time("greenhouse.date", "date", base.LOCAL)
 
-values = {}
-
-sensor_type = ProtoField.bytes("greenhouse.sensor_type", "type", base.SPACE)
+data = ProtoField.bytes("greenhouse.date", "data", base.DOT)
 
 
-device_nr = ProtoField.bytes("greenhouse.device_number", "deviceNumber", base.DOT)
-
-greenhouse_protocol.fields = { message_length, date, sensor_type, device_nr }
-
+greenhouse_protocol.fields = { message_length, date, data}
 
 function greenhouse_protocol.dissector(buffer, pinfo, tree)
   length = buffer:len()
@@ -24,14 +19,30 @@ function greenhouse_protocol.dissector(buffer, pinfo, tree)
 
   subtree:add_le(date, buffer(0,8))
 
-  --subtree:add_le(sensor_type, buffer(8,1))
-  --subtree:add_le(sensor_type, buffer(8,1):bitfield(1,1))
-  subtree:add_le("sensor type: " ..buffer(8,1):bitfield(0,2))
- 
-   
-  subtree:add_le(device_nr, buffer(9,1))
+  
+  local subsubtree = subtree:add(greenhouse_protocol, buffer(8, 1), "sensor info (type and number)")
+
+  subsubtree:add_le("sensor type : " ..buffer(8,1):bitfield(0,2))
+  subsubtree:add_le("device number : " ..buffer(8,1):bitfield(2,5))
+
+
+  local datagram_type = buffer(8,1):bitfield(0,2)
+
+  if datagram_type == 0 then
+	data_length = 2
+  elseif datagram_type == 1 then
+	data_length = 3
+  elseif datagram_type == 2 then
+ 	data_length = 4
+  else 
+	--if type is invalid 
+	data_length = 0 
+  end
+
+  --data_length = 8
+  subtree:add_le(data, buffer(9, data_length))
 
 end
 
-local tcp_port = DissectorTable.get("udp.port")
-tcp_port:add(8080, greenhouse_protocol)
+local udp_port = DissectorTable.get("udp.port")
+udp_port:add(8080, greenhouse_protocol)
