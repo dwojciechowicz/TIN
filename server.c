@@ -7,7 +7,7 @@
 #include <arpa/inet.h> // inet_pton()
 #include <sys/socket.h>
 
-#define SERWER_PORT 8888
+#define SERWER_PORT 8080
 #define SERWER_IP "192.168.1.27"
 
 

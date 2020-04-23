@@ -12,9 +12,9 @@
 //moje
 #include <pthread.h>
 
-#define SERWER_PORT 8888
+#define SERWER_PORT 8080
 #define SERWER_IP "192.168.1.27"
-#define BUFFER_SIZE 10
+#define BUFFER_SIZE 9 //informacja o dacie, godzinie, typie czujnika i numerze urządzenia
 
 #define SENSOR_TYPES_NUMBER 3
 #define TEMP_POW 0 //identyfikacja czujnika mierzacego temperature powietrza

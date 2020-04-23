@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
     {
       //setting sensor sensor_parametres
       parametres[i][j].type=i;
-      parametres[i][j].device_number=j+1; //numeracja urządzeń od 1 ??
+      parametres[i][j].device_number=j; //numeracja urządzeń od 0
       if(pthread_create(*(sensor_threads+i)+j, NULL, sensor, *(parametres+i)+j)) //creating the thread
       {
         printf( "Error- pthread_create (i=%d, j=%d)", i, j );

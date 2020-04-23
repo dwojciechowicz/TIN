@@ -57,14 +57,13 @@ void measure(char* buffer, int sensor_type, int number)
     {
       current_byte=((t&mask)>>(8*(7-i)));
       //printf("i= %d  maska= %lu   %ld     %ld\n", i, mask, t&mask, current_byte);
-      buffer[i]=(uint8_t)current_byte;
+      buffer[7-i]=(uint8_t)current_byte;
       mask=mask<<8;
     }
-  //typ ramki (bajt 8 bufora)
-    buffer[8]=(uint8_t)sensor_type;
-
-  //nr urzadzenia (9 bajt bufora)
-    buffer[9]=(uint8_t)number;
+  //typ ramki (2 bity 8 bajtu bufora)
+  //nr urzadzenia (5 bitów 8 bajtu bufora)
+    buffer[8]=((uint8_t)sensor_type<<6);
+    buffer[8]=buffer[8] | ((uint8_t)number<<1);
 }
 
 void disp_buffer(char* buffer) //można by to lepiej napisać
