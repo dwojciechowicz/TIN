@@ -36,6 +36,13 @@ int main(int argc, char *argv[])
         printf( "Error- pthread_create (i=%d, j=%d)", i, j );
         return 2;
       }
+    }
+  }
+
+  for(i=0;i<SENSOR_TYPES_NUMBER;++i)
+  {
+    for(j=0;j<atoi(argv[i+1]);++j)
+    {
       if(pthread_join(*(*(sensor_threads+i)+j), NULL)) //joining
       {
         printf( "Error- pthread_join  (i=%d, j=%d)", i, j);
@@ -44,6 +51,14 @@ int main(int argc, char *argv[])
     }
   }
 
+  //zwalnianie pamięci
+  for(i=0;i<SENSOR_TYPES_NUMBER;++i)
+  {
+      free(sensor_threads[i]);
+      free(parametres[i]);
+  }
+  free(sensor_threads);
+  free(parametres);
 
   return 0;
 }

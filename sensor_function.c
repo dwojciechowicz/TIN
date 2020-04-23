@@ -28,7 +28,7 @@ void* sensor(void* param)
     //printf("Bufor na poczatku: ");
     //disp_buffer(buffer);
     int i;
-    for(i=1; i<=1;i++)
+    for(i=1; i<=5;i++) //liczba pomiarów każdego czujnika - docelowo tu chyba będzie while(1)
     {
         measure(buffer, parametres->type, parametres->device_number);
         printf( "|Message %d for server|: ", i);
@@ -39,7 +39,7 @@ void* sensor(void* param)
             perror( "ERROR-sendto() \n" );
             exit( 1 );
         }
-        sleep(2);
+        sleep(PERIOD);
       }
     shutdown( socket_, SHUT_RDWR );
 }

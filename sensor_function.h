@@ -14,6 +14,7 @@
 
 #define SERWER_PORT 8080
 #define SERWER_IP "192.168.1.27"
+#define PERIOD 2 //czas (w sekundach) między kolejnyi pomiarami
 #define BUFFER_SIZE 9 //informacja o dacie, godzinie, typie czujnika i numerze urządzenia
 
 #define SENSOR_TYPES_NUMBER 3
