@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
     printf("<liczba czujnikow mierzacych wilgotnosc powietrza> <liczba czujnikow mierzacych wilgotnosc gleby>\n");
     return 1;
   }
-
+  srand(time(NULL)); //dalej wykorzystywana bedzie funkcja rand()
   //sensor_threads - table with thread reference variables
   //parametres - table with structures of sensors' parametres
   pthread_t **sensor_threads=(pthread_t **)malloc(SENSOR_TYPES_NUMBER*sizeof(pthread_t *));

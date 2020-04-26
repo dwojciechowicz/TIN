@@ -8,5 +8,5 @@ all: server sensors
 server: server.c
 		$(CC) server.c -o server
 
-sensors: sensor_function.c sensors.c
-		$(CC) sensor_function.c sensors.c -o sensors -lpthread
+sensors: normalDistribution.c sensor_function.c sensors.c
+		$(CC) normalDistribution.c sensor_function.c sensors.c -o sensors -lpthread -lm

@@ -52,7 +52,6 @@ int main()
             perror( "recvfrom() ERROR" );
             exit( 4 );
         }
-        printf( "|Message from client|: %s \n", buffer );
 
         char buffer_ip[ 128 ] = { };
         printf( "|Client ip: %s port: %d|\n", inet_ntop( AF_INET, & client.sin_addr, buffer_ip, sizeof( buffer_ip ) ), ntohs( client.sin_port ) );
