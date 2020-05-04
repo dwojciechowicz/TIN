@@ -1,18 +1,29 @@
-//Autor: Magdalena Zych
+//Autorzy: Magdalena Zych
+//	   Dorota Wojciechowicz
 //Data: 22.04.2020
 
 #include <stdio.h>
 #include <stdlib.h> // exit()
 #include <string.h> // memset()
+#include <time.h> //localtime()
 #include <arpa/inet.h> // inet_pton()
 #include <sys/socket.h>
 
 #define SERWER_PORT 8080
-#define SERWER_IP "192.168.1.27"
+#define SERWER_IP "192.168.1.214"
+#define INITIAL_MASK 255
+#define DATE_LENGTH 8 //liczba bajtów na których zapisywana jest data i godzina
+#define BUFFER_SIZE 13 //informacja o dacie, godzinie, typie czujnika, numerze urządzenia i z mierzonej wartości 
 
+union bytesInterpretation  //unia potrzebna do wykonywania operacji logicznych na bitach zmiennej typu float
+{
+  float floatValue;
+  int intValue;
+};
 
 int main()
 {
+    FILE * file;
     struct sockaddr_in serwer =
     {
         .sin_family = AF_INET,
@@ -52,6 +63,40 @@ int main()
             perror( "recvfrom() ERROR" );
             exit( 4 );
         }
+
+ 	time_t t = 0;
+ 	int i;
+  	for(i=0; i<DATE_LENGTH; ++i)
+  	{
+  	    t=t+((uint64_t)(buffer[i]&INITIAL_MASK)<<(8*i));
+  	}
+	
+	struct tm *timeinfo;
+	timeinfo = localtime(&t);
+
+	char date[85];
+	char hour[30];
+	int sensor_type = (buffer[DATE_LENGTH]&192)>>6;
+	int sensor_nr = (buffer[DATE_LENGTH]&60)>>1;
+	union bytesInterpretation measurement;
+	measurement.intValue = 0;
+
+	strftime( date,85,"%F.txt",timeinfo); //format yyyy-mm-dd
+	strftime( hour,30,"Godzina pomiaru: %X",timeinfo); //format hh-mm-ss
+	for(i=0; i<BUFFER_SIZE - DATE_LENGTH; ++i)
+	{
+	     measurement.intValue=measurement.intValue+((int)(buffer[i+DATE_LENGTH+1]&INITIAL_MASK)<<(8*i));
+	}
+	 
+	if((file=fopen(date,"a"))==NULL)
+	{
+	     perror( "fopen() ERROR" );
+	     exit( 5 );
+	}
+	fprintf(file,"%s ", hour);
+	fprintf(file,"Typ czujnika: %d nr.%d ", sensor_type,sensor_nr);
+	fprintf(file,"Pomiar: %f\n", measurement.floatValue);
+	fclose(file);
 
         char buffer_ip[ 128 ] = { };
         printf( "|Client ip: %s port: %d|\n", inet_ntop( AF_INET, & client.sin_addr, buffer_ip, sizeof( buffer_ip ) ), ntohs( client.sin_port ) );
