@@ -2,6 +2,7 @@
 //Data: 22.04.2020
 
 #include "sensor_function.h"
+#define SERWER_IP "192.168.1.220"
 
 void* sensor(void* param)
 {
@@ -26,7 +27,7 @@ void* sensor(void* param)
     char buffer[BUFFER_SIZE]="";
     struct sensor_parametres* parametres=(struct sensor_parametres *)param;
     int i;
-    for(i=1; i<=1;i++) //liczba pomiarów każdego czujnika - docelowo tu chyba będzie while(1)
+    for(i=1; i<4; i++) //liczba pomiarów każdego czujnika - docelowo tu chyba będzie while(1)
     {
         measure(buffer, parametres->type, parametres->device_number);
         printf( "|Message nr %d for server|: ", i);
@@ -50,7 +51,7 @@ void measure(char* buffer, int sensor_type, int number)
     //typ ramki (2 bity 8 bajtu bufora), nr urzadzenia (5 bitów 8 bajtu bufora)
     //informacje te zapisywane są na kolejnym bajcie po dacie i godzinie, czyli na bajcie nr: DATE_LENGTH
     buffer[DATE_LENGTH]=((uint8_t)sensor_type<<6);
-    buffer[DATE_LENGTH]=buffer[DATE_LENGTH] | ((uint8_t)number<<1);
+    buffer[DATE_LENGTH]=buffer[DATE_LENGTH] | ((uint8_t)number);
 
     //zapis do bufora wygenerowanej wartości zmierzonej (bajty 9-13 bufora)
     writeMeasurement(buffer, sensor_type, 10.0, 1.0);
@@ -102,7 +103,6 @@ void writeMeasurement(char* buffer, int sensor_type, float mean, float std)
       printf("Nieznany typ czujnika \n");
   }
   printf("pomiar: %f\n", measurement.floatValue);
-
   //wartość pomiaru (4 bajty - od 9 do 12 bajtu bufora)
   uint32_t mask_32 = INITIAL_MASK;
   uint32_t current_byte_32 = 0;

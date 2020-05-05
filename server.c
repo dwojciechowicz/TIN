@@ -3,6 +3,7 @@
 //Data: 22.04.2020
 
 #include "server.h"
+#define SERWER_IP "192.168.1.220"
 
 int main()
 {
@@ -60,7 +61,7 @@ int main()
 	char date[85];
 	char hour[30];
 	int sensor_type = (buffer[DATE_LENGTH]&192)>>6;
-	int sensor_nr = (buffer[DATE_LENGTH]&60)>>1;
+	int sensor_nr = buffer[DATE_LENGTH]&63;
 	union bytesInterpretation measurement;
 	measurement.intValue = 0;
 
@@ -78,7 +79,10 @@ int main()
 	}
 	fprintf(file,"%s ", hour);
 	fprintf(file,"Typ czujnika: %d nr.%d ", sensor_type,sensor_nr);
-	fprintf(file,"Pomiar: %f\n", measurement.floatValue);
+	if(sensor_nr == 0)
+	     fprintf(file,"Pomiar: %.3f\n", measurement.floatValue);
+	else
+	     fprintf(file,"Pomiar: %.2f\n", measurement.floatValue);
 	fclose(file);
 
         char buffer_ip[ 128 ] = { };
