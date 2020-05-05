@@ -1,3 +1,5 @@
+--Autor: Maria Jarek
+--Data: 22.04.2020
 greenhouse_protocol = Proto("UDP-lite-GH",  "UDP lite GreenHouse Protocol")
 
 message_length = ProtoField.int32("greenhouse.message_length", "messageLength", base.DEC)
@@ -23,7 +25,7 @@ function greenhouse_protocol.dissector(buffer, pinfo, tree)
   local subsubtree = subtree:add(greenhouse_protocol, buffer(8, 1), "sensor info (type and number)")
 
   subsubtree:add_le("sensor type : " ..buffer(8,1):bitfield(0,2))
-  subsubtree:add_le("device number : " ..buffer(8,1):bitfield(2,5))
+  subsubtree:add_le("device number : " ..buffer(8,1):bitfield(2,6))
 
 
   local datagram_type = buffer(8,1):bitfield(0,2)
