@@ -3,7 +3,7 @@
 //Data: 22.04.2020
 
 #include "server.h"
-#define SERWER_IP "192.168.1.220"
+//#define SERWER_IP "192.168.1.220"
 
 int main()
 {
@@ -54,7 +54,7 @@ int main()
   	{
   	    t=t+((uint64_t)(buffer[i]&INITIAL_MASK)<<(8*i));
   	}
-	
+
 	struct tm *timeinfo;
 	timeinfo = localtime(&t);
 
@@ -71,7 +71,7 @@ int main()
 	{
 	     measurement.intValue=measurement.intValue+((int)(buffer[i+DATE_LENGTH+1]&INITIAL_MASK)<<(8*i));
 	}
-	 
+
 	if((file=fopen(date,"a"))==NULL)
 	{
 	     perror( "fopen() ERROR" );

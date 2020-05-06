@@ -1,5 +1,5 @@
 //Autor: Dorota Wojciechowicz
-//Data: 22.04.2020
+//Data: 03.05.2020
 
 #include <stdio.h>
 #include <stdlib.h> // exit()
@@ -9,10 +9,10 @@
 #include <sys/socket.h>
 
 #define SERWER_PORT 8080
-#define SERWER_IP "192.168.1.215"
+#define SERWER_IP "192.168.1.26"
 #define INITIAL_MASK 255
 #define DATE_LENGTH 8 //liczba bajtów na których zapisywana jest data i godzina
-#define BUFFER_SIZE 13 //informacja o dacie, godzinie, typie czujnika, numerze urządzenia i z mierzonej wartości 
+#define BUFFER_SIZE 13 //informacja o dacie, godzinie, typie czujnika, numerze urządzenia i z mierzonej wartości
 
 union bytesInterpretation  //unia potrzebna do wykonywania operacji logicznych na bitach zmiennej typu float
 {

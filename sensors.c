@@ -1,8 +1,7 @@
 //Autor: Magdalena Zych
 //Data: 22.04.2020
 
-#include <pthread.h>
-#include "sensor_function.h"
+#include "sensors.h"
 
 int main(int argc, char *argv[])
 {
@@ -12,32 +11,24 @@ int main(int argc, char *argv[])
     printf("<liczba czujnikow mierzacych wilgotnosc powietrza> <liczba czujnikow mierzacych wilgotnosc gleby>\n");
     return 1;
   }
-  int i, j;
-  for(i=0;i<SENSOR_TYPES_NUMBER;++i)
-  {
-	j = atoi(argv[i+1]);
-	if(j>64 || j<0)
-	{
-	    printf("Program przeznaczony na od 0 do max 64 czujników jednego rodzaju\n");
-	    return 3;
-	}
-  }
- 
+
+  if(!check_arguments(argv)) return 2;
+
   srand(time(NULL)); //dalej wykorzystywana bedzie funkcja rand()
   //sensor_threads - table with thread reference variables
   //parametres - table with structures of sensors' parametres
   pthread_t **sensor_threads=(pthread_t **)malloc(SENSOR_TYPES_NUMBER*sizeof(pthread_t *));
   struct sensor_parametres **parametres=(struct sensor_parametres **)malloc(SENSOR_TYPES_NUMBER*sizeof(struct sensor_parametres *));
-  
-  for(i=0;i<SENSOR_TYPES_NUMBER;++i)
+
+  for(int i=0;i<SENSOR_TYPES_NUMBER;++i)
   {
       sensor_threads[i]=(pthread_t *)malloc(atoi(argv[i+1])*sizeof(pthread_t));
       parametres[i]=(struct sensor_parametres *)malloc(atoi(argv[i+1])*sizeof(struct sensor_parametres));
   }
 
-  for(i=0;i<SENSOR_TYPES_NUMBER;++i)
+  for(int i=0;i<SENSOR_TYPES_NUMBER;++i)
   {
-    for(j=0;j<atoi(argv[i+1]);++j)
+    for(int j=0;j<atoi(argv[i+1]);++j)
     {
       //setting sensor sensor_parametres
       parametres[i][j].type=i;
@@ -50,9 +41,9 @@ int main(int argc, char *argv[])
     }
   }
 
-  for(i=0;i<SENSOR_TYPES_NUMBER;++i)
+  for(int i=0;i<SENSOR_TYPES_NUMBER;++i)
   {
-    for(j=0;j<atoi(argv[i+1]);++j)
+    for(int j=0;j<atoi(argv[i+1]);++j)
     {
       if(pthread_join(*(*(sensor_threads+i)+j), NULL)) //joining
       {
@@ -63,7 +54,7 @@ int main(int argc, char *argv[])
   }
 
   //zwalnianie pamięci
-  for(i=0;i<SENSOR_TYPES_NUMBER;++i)
+  for(int i=0;i<SENSOR_TYPES_NUMBER;++i)
   {
       free(sensor_threads[i]);
       free(parametres[i]);
@@ -72,4 +63,31 @@ int main(int argc, char *argv[])
   free(parametres);
 
   return 0;
+}
+
+bool check_arguments(char *arguments[])
+{
+  char *argument;
+  int i, j;
+  for(i=0;i<SENSOR_TYPES_NUMBER;++i)
+  {
+    argument=arguments[i+1];
+    for(int k=0; k<strlen(argument); ++k)
+    {
+      if(!isdigit(argument[k]))
+      {
+        printf("Podany argument nie jest liczba\n");
+        return false;
+      }
+    }
+
+    j = atoi(argument);
+
+    if(j>64 || j<0)
+    {
+        printf("Program przeznaczony na od 0 do max 64 czujników jednego rodzaju\n");
+        return false;
+    }
+   }
+   return true;
 }

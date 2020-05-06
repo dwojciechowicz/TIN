@@ -13,7 +13,7 @@
 #include "normalDistribution.h"
 
 #define SERWER_PORT 8080
-#define SERWER_IP "192.168.1.27"
+#define SERWER_IP "192.168.1.26"
 #define PERIOD 2 //czas (w sekundach) między kolejnyi pomiarami
 #define DATE_LENGTH 8 //liczba bajtów na których zapisywana jest data i godzina
 #define BUFFER_SIZE 13 //informacja o dacie, godzinie, typie czujnika, numerze urządzenia i z mierzonej wartości (4 bajty)

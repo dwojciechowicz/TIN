@@ -2,7 +2,7 @@
 //Data: 22.04.2020
 
 #include "sensor_function.h"
-#define SERWER_IP "192.168.1.220"
+//#define SERWER_IP "192.168.1.220"
 
 void* sensor(void* param)
 {
