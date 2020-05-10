@@ -7,9 +7,8 @@
 #include <time.h> //localtime()
 #include <arpa/inet.h> // inet_pton()
 #include <sys/socket.h>
+#include "parameters.h"
 
-#define SERWER_PORT 8080
-#define SERWER_IP "192.168.1.26"
 #define INITIAL_MASK 255
 #define DATE_LENGTH 8 //liczba bajtów na których zapisywana jest data i godzina
 #define BUFFER_SIZE 13 //informacja o dacie, godzinie, typie czujnika, numerze urządzenia i z mierzonej wartości

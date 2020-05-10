@@ -3,17 +3,20 @@
 //Data: 22.04.2020
 
 #include "server.h"
-//#define SERWER_IP "192.168.1.220"
 
 int main()
 {
+    char server_ip[20];
+    int server_port;
+    get_server_parameters(server_ip, &server_port);
+
     FILE * file;
     struct sockaddr_in serwer =
     {
         .sin_family = AF_INET,
-        .sin_port = htons( SERWER_PORT )
+        .sin_port = htons( server_port )
     };
-    if( inet_pton( AF_INET, SERWER_IP, & serwer.sin_addr ) <= 0 )
+    if( inet_pton( AF_INET, server_ip, & serwer.sin_addr ) <= 0 )
     {
         perror( "inet_pton() ERROR" );
         exit( 1 );

@@ -5,8 +5,8 @@ CC=gcc
 
 all: server sensors
 
-server: server.c
-		$(CC) server.c -o server
+server: server.c parameters.c
+		$(CC) server.c parameters.c -o server
 
-sensors: normalDistribution.c sensor_function.c sensors.c
-		$(CC) normalDistribution.c sensor_function.c sensors.c -o sensors -lpthread -lm
+sensors: normalDistribution.c sensor_function.c sensors.c parameters.c
+		$(CC) normalDistribution.c sensor_function.c sensors.c parameters.c -o sensors -lpthread -lm

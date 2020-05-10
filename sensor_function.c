@@ -2,16 +2,15 @@
 //Data: 22.04.2020
 
 #include "sensor_function.h"
-//#define SERWER_IP "192.168.1.220"
 
 void* sensor(void* param)
 {
     struct sockaddr_in serwer =
     {
         .sin_family = AF_INET,
-        .sin_port = htons( SERWER_PORT )
+        .sin_port = htons( server_port )
     };
-    if( inet_pton( AF_INET, SERWER_IP, & serwer.sin_addr ) <= 0 )
+    if( inet_pton( AF_INET, server_ip, & serwer.sin_addr ) <= 0 )
     {
         printf( "ERROR-inet_pton() \n" );
         exit( 1 );
@@ -27,7 +26,7 @@ void* sensor(void* param)
     char buffer[BUFFER_SIZE]="";
     struct sensor_parametres* parametres=(struct sensor_parametres *)param;
     int i;
-    for(i=1; i<4; i++) //liczba pomiarów każdego czujnika - docelowo tu chyba będzie while(1)
+    for(i=1; i<10; i++) //liczba pomiarów każdego czujnika - docelowo tu będzie while(1)
     {
         measure(buffer, parametres->type, parametres->device_number);
         printf( "|Message nr %d for server|: ", i);

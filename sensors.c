@@ -3,6 +3,9 @@
 
 #include "sensors.h"
 
+char server_ip[20];
+int server_port;
+
 int main(int argc, char *argv[])
 {
   if(argc < SENSOR_TYPES_NUMBER+1) //zrobic jakis krótszy komunikat
@@ -12,6 +15,8 @@ int main(int argc, char *argv[])
     return 1;
   }
 
+  //wczytywanie z pliku parametres.txt adresu ip oraz portu
+  get_server_parameters(server_ip, &server_port);
   if(!check_arguments(argv)) return 2;
 
   srand(time(NULL)); //dalej wykorzystywana bedzie funkcja rand()
