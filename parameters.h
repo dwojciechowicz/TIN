@@ -4,4 +4,4 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-int get_server_parameters(char *ip, int* port);
+int get_server_parameters(char *ip, int* port, int server_nr);

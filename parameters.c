@@ -3,7 +3,7 @@
 
 #include "parameters.h"
 
-int get_server_parameters(char *ip, int* port)
+int get_server_parameters(char *ip, int* port, int server_nr)
 {
   FILE *file;
   if((file=fopen("parameters.txt","r"))==NULL)
@@ -11,7 +11,10 @@ int get_server_parameters(char *ip, int* port)
        perror( "fopen() ERROR" );
        exit( 5 );
   }
-  fscanf(file, "%s", ip);
-  fscanf(file, "%d", port);
+  for(int i=0; i<server_nr; ++i)
+  {
+    fscanf(file, "%s", ip);
+    fscanf(file, "%d", port);
+  }
   fclose(file);
 }

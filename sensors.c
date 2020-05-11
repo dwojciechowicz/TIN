@@ -14,9 +14,8 @@ int main(int argc, char *argv[])
     printf("<liczba czujnikow mierzacych wilgotnosc powietrza> <liczba czujnikow mierzacych wilgotnosc gleby>\n");
     return 1;
   }
-
   //wczytywanie z pliku parametres.txt adresu ip oraz portu
-  get_server_parameters(server_ip, &server_port);
+  get_server_parameters(server_ip, &server_port, 1);
   if(!check_arguments(argv)) return 2;
 
   srand(time(NULL)); //dalej wykorzystywana bedzie funkcja rand()
@@ -24,15 +23,18 @@ int main(int argc, char *argv[])
   //parametres - table with structures of sensors' parametres
   pthread_t **sensor_threads=(pthread_t **)malloc(SENSOR_TYPES_NUMBER*sizeof(pthread_t *));
   struct sensor_parametres **parametres=(struct sensor_parametres **)malloc(SENSOR_TYPES_NUMBER*sizeof(struct sensor_parametres *));
+  struct sensor_threads_info threads_info;
+  threads_info.threads_table_ptr=sensor_threads;
 
   for(int i=0;i<SENSOR_TYPES_NUMBER;++i)
   {
       sensor_threads[i]=(pthread_t *)malloc(atoi(argv[i+1])*sizeof(pthread_t));
       parametres[i]=(struct sensor_parametres *)malloc(atoi(argv[i+1])*sizeof(struct sensor_parametres));
   }
-
   for(int i=0;i<SENSOR_TYPES_NUMBER;++i)
   {
+    threads_info.sensors_nr[i]=atoi(argv[i+1]);
+
     for(int j=0;j<atoi(argv[i+1]);++j)
     {
       //setting sensor sensor_parametres
@@ -46,6 +48,10 @@ int main(int argc, char *argv[])
     }
   }
 
+  //wątek z serwerem diagnostyki itp
+  pthread_t diag_server_thread;
+  pthread_create(&diag_server_thread, NULL, diag_server_func, (void *)(&threads_info));
+
   for(int i=0;i<SENSOR_TYPES_NUMBER;++i)
   {
     for(int j=0;j<atoi(argv[i+1]);++j)
@@ -56,6 +62,17 @@ int main(int argc, char *argv[])
         return 5;
       }
     }
+  }
+
+  if(pthread_cancel(diag_server_thread))
+  {
+    printf( "Error- pthread_cancel (diag_server_thread)");
+    return(5);
+  }
+  if(pthread_join(diag_server_thread, NULL)) //joining
+  {
+    printf( "Error- pthread_join  (diag_server_thread)");
+    return 5;
   }
 
   //zwalnianie pamięci
@@ -95,4 +112,60 @@ bool check_arguments(char *arguments[])
     }
    }
    return true;
+}
+
+void* diag_server_func(void* param)
+{
+  char diag_server_ip[20];
+  int diag_server_port;
+  get_server_parameters(diag_server_ip, &diag_server_port, 3);
+
+  struct sockaddr_in server =
+  {
+      .sin_family = AF_INET,
+      .sin_port = htons(diag_server_port)
+  };
+  if( inet_pton( AF_INET, diag_server_ip, & server.sin_addr ) <= 0 )
+  {
+      perror( "inet_pton() ERROR" );
+      exit( 1 );
+  }
+  const int socket_ = socket( AF_INET, SOCK_DGRAM, 0 );
+  if(( socket_ ) < 0 )
+  {
+      perror( "socket() ERROR" );
+      exit( 2 );
+  }
+  socklen_t server_size = sizeof(server);
+  if( bind( socket_,( struct sockaddr * ) & server, server_size) < 0 )
+  {
+      perror( "bind() ERROR" );
+      exit( 3 );
+  }
+  char action[ 10 ] = { };
+  while( 1 )
+  {
+      struct sockaddr_in client = { };
+      memset( action, 0, sizeof( action ) );
+      if( recvfrom( socket_, action, sizeof( action ), 0,( struct sockaddr * )&client, &server_size ) < 0 )
+      {
+          perror( "recvfrom() ERROR" );
+          exit( 4 );
+      }
+      if(strcmp(action, "stop")==0)
+      {
+          struct sensor_threads_info threads_info=*(struct sensor_threads_info*)param;
+          for(int i=0;i<SENSOR_TYPES_NUMBER;++i)
+          {
+            for(int j=0;j<threads_info.sensors_nr[i];++j)
+            {
+              if(pthread_cancel(*(*(threads_info.threads_table_ptr+i)+j)))
+              {
+                printf( "Error- pthread_cancel (i=%d, j=%d)", i, j );
+                exit(4);
+              }
+            }
+          }
+    }
+  }
 }

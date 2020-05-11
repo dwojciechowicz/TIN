@@ -8,7 +8,7 @@ int main()
 {
     char server_ip[20];
     int server_port;
-    get_server_parameters(server_ip, &server_port);
+    get_server_parameters(server_ip, &server_port, 1);
 
     FILE * file;
     struct sockaddr_in serwer =
