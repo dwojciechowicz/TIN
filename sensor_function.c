@@ -26,7 +26,7 @@ void* sensor(void* param)
     char buffer[BUFFER_SIZE]="";
     struct sensor_parametres* parametres=(struct sensor_parametres *)param;
     int i;
-    for(i=1; i<10; i++) //liczba pomiarów każdego czujnika - docelowo tu będzie while(1)
+    for(i=1; i<4; i++) //liczba pomiarów każdego czujnika - docelowo tu będzie while(1)
     {
         measure(buffer, parametres->type, parametres->device_number);
         printf( "|Message nr %d for server|: ", i);

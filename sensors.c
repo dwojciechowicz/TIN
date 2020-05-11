@@ -66,7 +66,7 @@ int main(int argc, char *argv[])
 
   if(pthread_cancel(diag_server_thread))
   {
-    printf( "Error- pthread_cancel (diag_server_thread)");
+    printf( "Error- pthread_cancel (diag_server_thread)\n");
     return(5);
   }
   if(pthread_join(diag_server_thread, NULL)) //joining
@@ -152,7 +152,7 @@ void* diag_server_func(void* param)
           perror( "recvfrom() ERROR" );
           exit( 4 );
       }
-      if(strcmp(action, "stop")==0)
+      if(strcmp(action, "stop")==0)  //wyłączanie czujników
       {
           struct sensor_threads_info threads_info=*(struct sensor_threads_info*)param;
           for(int i=0;i<SENSOR_TYPES_NUMBER;++i)
@@ -161,11 +161,25 @@ void* diag_server_func(void* param)
             {
               if(pthread_cancel(*(*(threads_info.threads_table_ptr+i)+j)))
               {
+                //odpowiedź że nie udało się wyłączyć czujnikow
+                char buffer[5]="ERR";
+                if( sendto( socket_, buffer, strlen( buffer ), 0,( struct sockaddr * ) & client, server_size ) < 0 )
+                {
+                    perror( "sendto() ERROR" );
+                    exit( 5 );
+                }
                 printf( "Error- pthread_cancel (i=%d, j=%d)", i, j );
                 exit(4);
               }
             }
           }
-    }
+          //odpowiedź że udało się wyłączyć czujniki
+          char buffer[5]="OK";
+          if( sendto( socket_, buffer, strlen( buffer ), 0,( struct sockaddr * ) & client, server_size ) < 0 )
+          {
+              perror( "sendto() ERROR" );
+              exit( 5 );
+          }
+      }
   }
 }

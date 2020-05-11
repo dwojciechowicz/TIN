@@ -37,5 +37,20 @@ int main(int argc, char *argv[])
         perror( "ERROR-sendto() \n" );
         exit( 1 );
     }
+
+    //odpowiedź
+    struct sockaddr_in from = { };
+    char buffer[5];
+    memset( buffer, 0, sizeof( buffer ) );
+    if( recvfrom( socket_, buffer, sizeof( buffer ), 0,( struct sockaddr * ) & from, & server_size ) < 0 )
+    {
+        perror( "recvfrom() ERROR" );
+        exit( 1 );
+    }
+    if(strcmp(buffer, "OK")==0)
+      printf( "Udalo sie wylaczyc wszystkie czujniki\n");
+    else
+      printf( "stop_sensors() ERROR\n");
+
     shutdown( socket_, SHUT_RDWR );
 }
