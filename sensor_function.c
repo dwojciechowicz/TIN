@@ -25,9 +25,11 @@ void* sensor(void* param)
 
     char buffer[BUFFER_SIZE]="";
     struct sensor_parametres* parametres=(struct sensor_parametres *)param;
-    int i;
-    for(i=1; i<4; i++) //liczba pomiarów każdego czujnika - docelowo tu będzie while(1)
+    int i=0;
+    //for(i=1; i<4; i++) //liczba pomiarów każdego czujnika - docelowo tu będzie while(1)
+    while(1) //zatrzymanie działania sensorów poprzez "./stop_sensors"
     {
+        ++i;
         measure(buffer, parametres->type, parametres->device_number);
         printf( "|Message nr %d for server|: ", i);
         disp_buffer(buffer);
@@ -37,6 +39,9 @@ void* sensor(void* param)
             perror( "ERROR-sendto() \n" );
             exit( 1 );
         }
+        pthread_mutex_lock(&mutex_sent_packets);
+        ++sent_packets;
+        pthread_mutex_unlock(&mutex_sent_packets);
         sleep(PERIOD);
       }
     shutdown( socket_, SHUT_RDWR );

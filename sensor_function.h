@@ -26,6 +26,8 @@
 
 extern char server_ip[20];
 extern int server_port;
+extern int sent_packets;
+extern pthread_mutex_t mutex_sent_packets;
 
 void* sensor(void* param);
 void measure(char* buffer, int sensor_type, int number); //przygotowanie pomiaru

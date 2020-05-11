@@ -2,6 +2,9 @@
 //        Magdalena Zych
 //Data: 06.05.2020
 
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 #include <ctype.h>
 #include <pthread.h>
 #include "sensor_function.h"
@@ -15,4 +18,10 @@ struct sensor_threads_info
 {
   pthread_t **threads_table_ptr;
   int sensors_nr[SENSOR_TYPES_NUMBER];
+};
+
+union intInBuffer  //unia potrzebna do zapisania liczby typu int do bufora
+{
+  int intValue;
+  char buffer[5];
 };

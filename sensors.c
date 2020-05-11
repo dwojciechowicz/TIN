@@ -5,6 +5,8 @@
 
 char server_ip[20];
 int server_port;
+int sent_packets=0;
+pthread_mutex_t mutex_sent_packets=PTHREAD_MUTEX_INITIALIZER;
 
 int main(int argc, char *argv[])
 {
@@ -180,6 +182,19 @@ void* diag_server_func(void* param)
               perror( "sendto() ERROR" );
               exit( 5 );
           }
+      }
+      else if(strcmp(action, "diag")==0) //diagnostyka
+      {
+        //wyslanie liczby oznaczajacej liczbe wyslanych pomiarow
+        union intInBuffer int_buffer;
+        pthread_mutex_lock(&mutex_sent_packets);
+        int_buffer.intValue=sent_packets;
+        pthread_mutex_unlock(&mutex_sent_packets);
+        if( sendto( socket_, int_buffer.buffer, strlen( int_buffer.buffer ), 0,( struct sockaddr * ) & client, server_size ) < 0 )
+        {
+            perror( "sendto() ERROR" );
+            exit( 5 );
+        }
       }
   }
 }

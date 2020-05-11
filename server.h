@@ -8,13 +8,22 @@
 #include <arpa/inet.h> // inet_pton()
 #include <sys/socket.h>
 #include "parameters.h"
+#include <pthread.h>
 
 #define INITIAL_MASK 255
 #define DATE_LENGTH 8 //liczba bajtów na których zapisywana jest data i godzina
 #define BUFFER_SIZE 13 //informacja o dacie, godzinie, typie czujnika, numerze urządzenia i z mierzonej wartości
 
+void* diag_server_func(void* arg);
+
 union bytesInterpretation  //unia potrzebna do wykonywania operacji logicznych na bitach zmiennej typu float
 {
   float floatValue;
   int intValue;
+};
+
+union intInBuffer  //unia potrzebna do interpretacji liczby typu int z bufora
+{
+  int intValue;
+  char buffer[5];
 };

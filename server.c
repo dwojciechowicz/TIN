@@ -4,8 +4,16 @@
 
 #include "server.h"
 
+int received_packets=0;
+pthread_mutex_t mutex_received_packets=PTHREAD_MUTEX_INITIALIZER;
+
 int main()
 {
+    //wątek z serwerem diagnostyki
+    pthread_t diag_server_thread;
+    pthread_create(&diag_server_thread, NULL, diag_server_func, NULL);
+
+    //serwer oczekujący na pomiary
     char server_ip[20];
     int server_port;
     get_server_parameters(server_ip, &server_port, 1);
@@ -51,6 +59,10 @@ int main()
             exit( 4 );
         }
 
+  pthread_mutex_lock(&mutex_received_packets);
+  ++received_packets;
+  pthread_mutex_unlock(&mutex_received_packets);
+
  	time_t t = 0;
  	int i;
   	for(i=0; i<DATE_LENGTH; ++i)
@@ -93,4 +105,59 @@ int main()
     }
 
     shutdown( socket_, SHUT_RDWR );
+}
+
+void* diag_server_func(void* param)
+{
+  char diag_server_ip[20];
+  int diag_server_port;
+  get_server_parameters(diag_server_ip, &diag_server_port, 2);
+
+  struct sockaddr_in server =
+  {
+      .sin_family = AF_INET,
+      .sin_port = htons(diag_server_port)
+  };
+  if( inet_pton( AF_INET, diag_server_ip, & server.sin_addr ) <= 0 )
+  {
+      perror( "inet_pton() ERROR" );
+      exit( 1 );
+  }
+  const int socket_ = socket( AF_INET, SOCK_DGRAM, 0 );
+  if(( socket_ ) < 0 )
+  {
+      perror( "socket() ERROR" );
+      exit( 2 );
+  }
+  socklen_t server_size = sizeof(server);
+  if( bind( socket_,( struct sockaddr * ) & server, server_size) < 0 )
+  {
+      perror( "bind() ERROR" );
+      exit( 3 );
+  }
+  char action[ 10 ] = { };
+  while( 1 )
+  {
+      struct sockaddr_in client = { };
+      memset( action, 0, sizeof( action ) );
+      if( recvfrom( socket_, action, sizeof( action ), 0,( struct sockaddr * )&client, &server_size ) < 0 )
+      {
+          perror( "recvfrom() ERROR" );
+          exit( 4 );
+      }
+
+      if(strcmp(action, "diag")==0) //diagnostyka
+      {
+        //wyslanie liczby oznaczajacej liczbe odebranych pomiarow
+        union intInBuffer int_buffer;
+        pthread_mutex_lock(&mutex_received_packets);
+        int_buffer.intValue=received_packets;
+        pthread_mutex_unlock(&mutex_received_packets);
+        if( sendto( socket_, int_buffer.buffer, strlen( int_buffer.buffer ), 0,( struct sockaddr * ) & client, server_size ) < 0 )
+        {
+            perror( "sendto() ERROR" );
+            exit( 5 );
+        }
+      }
+  }
 }
