@@ -13,6 +13,7 @@
 
 bool check_arguments(char *arguments[]);
 void* diag_server_func(void* arg);
+bool check_param_communication(char str[]);
 
 struct sensor_threads_info
 {

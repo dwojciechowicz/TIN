@@ -42,7 +42,7 @@ void* sensor(void* param)
         pthread_mutex_lock(&mutex_sent_packets);
         ++sent_packets;
         pthread_mutex_unlock(&mutex_sent_packets);
-        sleep(PERIOD);
+        sleep(parametres->sleep_time);
       }
     shutdown( socket_, SHUT_RDWR );
 }

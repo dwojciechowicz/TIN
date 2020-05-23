@@ -38,6 +38,7 @@ struct sensor_parametres
 {
   int type; //typ czujnika (TEMP_POW, WILG_POW, WILG_GL)
   int device_number;
+  int sleep_time;
 };
 
 union bytesInterpretation  //unia potrzebna do wykonywania operacji logicznych na bitach zmiennej typu float

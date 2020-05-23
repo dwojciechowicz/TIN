@@ -8,6 +8,8 @@ int server_port;
 int sent_packets=0;
 pthread_mutex_t mutex_sent_packets=PTHREAD_MUTEX_INITIALIZER;
 
+struct sensor_parametres **parametres;
+
 int main(int argc, char *argv[])
 {
   if(argc < SENSOR_TYPES_NUMBER+1) //zrobic jakis krótszy komunikat
@@ -24,7 +26,8 @@ int main(int argc, char *argv[])
   //sensor_threads - table with thread reference variables
   //parametres - table with structures of sensors' parametres
   pthread_t **sensor_threads=(pthread_t **)malloc(SENSOR_TYPES_NUMBER*sizeof(pthread_t *));
-  struct sensor_parametres **parametres=(struct sensor_parametres **)malloc(SENSOR_TYPES_NUMBER*sizeof(struct sensor_parametres *));
+  //struct sensor_parametres **parametres=(struct sensor_parametres **)malloc(SENSOR_TYPES_NUMBER*sizeof(struct sensor_parametres *));
+  parametres=(struct sensor_parametres **)malloc(SENSOR_TYPES_NUMBER*sizeof(struct sensor_parametres *));
   struct sensor_threads_info threads_info;
   threads_info.threads_table_ptr=sensor_threads;
 
@@ -42,7 +45,8 @@ int main(int argc, char *argv[])
       //setting sensor sensor_parametres
       parametres[i][j].type=i;
       parametres[i][j].device_number=j; //numeracja urządzeń od 0
-      if(pthread_create(*(sensor_threads+i)+j, NULL, sensor, *(parametres+i)+j)) //creating the thread
+      parametres[i][j].sleep_time = PERIOD;
+      if(pthread_create(*(sensor_threads+i)+j, NULL, sensor, (void*)(*(parametres+i)+j))) //creating the thread
       {
         printf( "Error- pthread_create (i=%d, j=%d)", i, j );
         return 4;
@@ -144,7 +148,7 @@ void* diag_server_func(void* param)
       perror( "bind() ERROR" );
       exit( 3 );
   }
-  char action[ 10 ] = { };
+  char action[ 15 ] = { };
   while( 1 )
   {
       struct sockaddr_in client = { };
@@ -196,5 +200,36 @@ void* diag_server_func(void* param)
             exit( 5 );
         }
       }
+      else if(check_param_communication(action))
+      {
+        const char s[2] = " ";
+        char *token;
+
+        token = strtok(action, s);
+
+        char * new_params[5] = { };
+        for(int i=0; i<3; ++i)
+        {
+          new_params[i] = strtok(NULL, s);
+        }
+        //trzeba dodac kontrole wartosci przekazywanych w action
+        int i = atoi(new_params[0]);  //typ czujnika
+        int j = atoi(new_params[1]);  //nr_id_czujnika
+        int new_period = atoi(new_params[2]); //nowy okres wysylania pomiarow
+        printf("%d\n", i);
+        printf("%d\n", j);
+        printf("%d\n", new_period);
+        parametres[i][j].sleep_time = new_period;
+      }
   }
+}
+
+
+bool check_param_communication(char str[])
+{
+  if(strstr(str, "para") == str && strstr(str, " ") == str+4)
+	{
+		return true;
+	}
+	return false;
 }
