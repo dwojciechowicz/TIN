@@ -216,9 +216,6 @@ void* diag_server_func(void* param)
         int i = atoi(new_params[0]);  //typ czujnika
         int j = atoi(new_params[1]);  //nr_id_czujnika
         int new_period = atoi(new_params[2]); //nowy okres wysylania pomiarow
-        printf("%d\n", i);
-        printf("%d\n", j);
-        printf("%d\n", new_period);
         parametres[i][j].sleep_time = new_period;
       }
   }
