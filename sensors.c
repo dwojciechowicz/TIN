@@ -200,23 +200,9 @@ void* diag_server_func(void* param)
             exit( 5 );
         }
       }
-      else if(check_param_communication(action))
+      else if(check_param_communication(action)) //czy odebrany komunikat dotyczy zmiany okresu pomiarow
       {
-        const char s[2] = " ";
-        char *token;
-
-        token = strtok(action, s);
-
-        char * new_params[5] = { };
-        for(int i=0; i<3; ++i)
-        {
-          new_params[i] = strtok(NULL, s);
-        }
-        //trzeba dodac kontrole wartosci przekazywanych w action
-        int i = atoi(new_params[0]);  //typ czujnika
-        int j = atoi(new_params[1]);  //nr_id_czujnika
-        int new_period = atoi(new_params[2]); //nowy okres wysylania pomiarow
-        parametres[i][j].sleep_time = new_period;
+        set_new_sleep_time(action);
       }
   }
 }
@@ -224,9 +210,33 @@ void* diag_server_func(void* param)
 
 bool check_param_communication(char str[])
 {
+  //komunikat ten sklada sie ze slowa "para" oraz 3 argumentow:
+  // typu urzadzenia, nr urzadzenia oraz nowego okresu
   if(strstr(str, "para") == str && strstr(str, " ") == str+4)
 	{
 		return true;
 	}
 	return false;
+}
+
+void set_new_sleep_time(char action[])
+{
+  const char s[2] = " ";
+  char *token;
+
+  token = strtok(action, s);
+
+  char * new_params[5] = { };
+  for(int i=0; i<3; ++i)
+  {
+    new_params[i] = strtok(NULL, s);
+  }
+  //trzeba sprawdzic czy new_params zawiera 3 argumenty
+
+  //trzeba dodac kontrole wartosci przekazywanych w action - czy takie czujniki sa wlaczone
+  int i = atoi(new_params[0]);  //typ czujnika
+  int j = atoi(new_params[1]);  //nr_id_czujnika
+  int new_period = atoi(new_params[2]); //nowy okres wysylania pomiarow
+
+  parametres[i][j].sleep_time = new_period;
 }
