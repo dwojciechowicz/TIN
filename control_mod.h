@@ -8,6 +8,6 @@
 
 union intInBuffer  //unia potrzebna do zapisania liczby typu int do bufora
 {
-  int intValue;
-  char buffer[5];
+  uint64_t intValue;
+  char buffer[8];
 };

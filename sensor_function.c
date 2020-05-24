@@ -43,20 +43,11 @@ void* sensor(void* param)
 	int stare;
 	if(r!=1)
 	{
-	if (r==3)
-	{
-	stare = parameters->type;
-	parameters->type = 3;
-	}
 	if( sendto( socket_, &buffer, sizeof(buffer), 0,( struct sockaddr * ) & serwer, len ) < 0 )
         {
             perror( "ERROR-sendto() \n" );
             exit( 1 );
         }
-	if (r==3)
-	{
-	parameters->type = stare;
-	}
 	}
         pthread_mutex_lock(&mutex_sent_packets);
         ++sent_packets;

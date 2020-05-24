@@ -112,7 +112,7 @@ int main()
 	     pthread_mutex_lock(&mutex_received_wrong_packets);
 	     ++received_wrong_packets;
 	     pthread_mutex_unlock(&mutex_received_wrong_packets);
-	     printf( "measurement_range 1 ERROR\n" );
+	     printf( "measurement_range ERROR\n" );
 	     continue;
 	    // exit( 7 );
 	}
@@ -133,11 +133,10 @@ int main()
 	fprintf(file,"%s ", hour);
 	fprintf(file,"Typ czujnika: %d nr.%d ", sensor_type,sensor_nr);
 	if(sensor_nr == 0)
-	     fprintf(file,"Pomiar: %.3f\n", measurement.floatValue);
+	    { fprintf(file,"Pomiar: %.3f\n", measurement.floatValue);}
 	else
-	     fprintf(file,"Pomiar: %.2f\n", measurement.floatValue);
+	    { fprintf(file,"Pomiar: %.2f\n", measurement.floatValue);}
 	fclose(file);
-
         char buffer_ip[ 128 ] = { };
         printf( "|Client ip: %s port: %d|\n", inet_ntop( AF_INET, & client.sin_addr, buffer_ip, sizeof( buffer_ip ) ), ntohs( client.sin_port ) );
     }
@@ -188,9 +187,30 @@ void* diag_server_func(void* param)
       {
         //wyslanie liczby oznaczajacej liczbe odebranych pomiarow
         union intInBuffer int_buffer;
-        pthread_mutex_lock(&mutex_received_packets);
-        int_buffer.intValue=received_packets;
+ 	uint32_t mask_32 = 255;
+	uint32_t current_byte_32 = 0;
+	pthread_mutex_lock(&mutex_received_packets);
+        int dobre = received_packets;
         pthread_mutex_unlock(&mutex_received_packets);
+
+	pthread_mutex_lock(&mutex_received_wrong_packets);
+        int zle = received_wrong_packets;
+        pthread_mutex_unlock(&mutex_received_wrong_packets);
+
+	for(int i = 0; i < 4; ++i)
+	{
+	current_byte_32=((received_packets & mask_32)>>(8*i));
+	int_buffer.buffer[i]=(uint8_t)current_byte_32;
+	mask_32=mask_32<<8;
+        }
+
+	for(int i = 4; i < 8; ++i)
+	{
+	current_byte_32=((received_wrong_packets & mask_32)>>(8*i));
+	int_buffer.buffer[i]=(uint8_t)current_byte_32;
+	mask_32=mask_32<<8;
+        }
+
         if( sendto( socket_, int_buffer.buffer, strlen( int_buffer.buffer ), 0,( struct sockaddr * ) & client, server_size ) < 0 )
         {
             perror( "sendto() ERROR" );

@@ -1,5 +1,6 @@
 //control_mod.c
-//Autor: Maria Jarek
+//Autorzy: Maria Jarek
+//	 Dorota Wojciechowicz
 //Data: 24.05.2020
 #include "control_mod.h"
 
@@ -101,7 +102,7 @@ int main(int argc, char *argv[])
               perror( "recvfrom() ERROR" );
               exit( 1 );
           }
-          printf( "Liczba wyslanych pomiarow: %d\n", int_buffer.intValue);
+          printf( "Liczba wyslanych pomiarow: %ld\n", int_buffer.intValue);
           shutdown( socket_, SHUT_RDWR );
 
           //wyslanie zapytania do modułu odbierającego pomiary (serwera)
@@ -140,7 +141,18 @@ int main(int argc, char *argv[])
               perror( "recvfrom() ERROR" );
               exit( 1 );
           }
-          printf( "Liczba odebranych pomiarow: %d\n", int_buffer.intValue);
+	  int wrong=0;
+	  int good=0;
+	  for(int i=0; i<4; ++i)
+	  {
+	     good=good+((int)(int_buffer.buffer[i]&255)<<(8*i));
+	  }
+ 	  for(int i=4; i<8; ++i)
+	  {
+	     wrong=wrong+((int)(int_buffer.buffer[i]&255)<<(8*i));
+	  }
+          printf( "Liczba odebranych pomiarow: %d\n", good);
+          printf( "Liczba odebranych błędnych pakietów: %d\n", wrong);
         break;
 
       case 2:

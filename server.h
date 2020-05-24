@@ -25,6 +25,6 @@ union bytesInterpretation  //unia potrzebna do wykonywania operacji logicznych n
 
 union intInBuffer  //unia potrzebna do interpretacji liczby typu int z bufora
 {
-  int intValue;
-  char buffer[5];
+  uint64_t intValue;
+  char buffer[8];
 };
