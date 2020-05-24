@@ -1,4 +1,6 @@
+//sensor_function.c
 //Autor: Magdalena Zych
+//	 Dorota Wojciechowicz
 //Data: 22.04.2020
 
 #include "sensor_function.h"
@@ -25,6 +27,8 @@ void* sensor(void* param)
 
     char buffer[BUFFER_SIZE]="";
     struct sensor_parametres* parametres=(struct sensor_parametres *)param;
+    srand(time(NULL));
+    int r=0; // liczba pomocna przy "wysyłaniu" pakietów błędnych, lub tych co nie dotrą
     int i=0;
     //for(i=1; i<4; i++) //liczba pomiarów każdego czujnika - docelowo tu będzie while(1)
     while(1) //zatrzymanie działania sensorów poprzez "./stop_sensors"
@@ -34,11 +38,26 @@ void* sensor(void* param)
         printf( "|Message nr %d for server|: ", i);
         disp_buffer(buffer);
         socklen_t len = sizeof( serwer );
-        if( sendto( socket_, &buffer, sizeof(buffer), 0,( struct sockaddr * ) & serwer, len ) < 0 )
+	r = (int) rand()/(RAND_MAX+1.0)*100.0;
+	printf("%d\n",r);
+	int stare;
+	if(r!=1)
+	{
+	if (r==3)
+	{
+	stare = parametres->type;
+	parametres->type = 3;
+	}
+	if( sendto( socket_, &buffer, sizeof(buffer), 0,( struct sockaddr * ) & serwer, len ) < 0 )
         {
             perror( "ERROR-sendto() \n" );
             exit( 1 );
         }
+	if (r==3)
+	{
+	parametres->type = stare;
+	}
+	}
         pthread_mutex_lock(&mutex_sent_packets);
         ++sent_packets;
         pthread_mutex_unlock(&mutex_sent_packets);
@@ -58,7 +77,10 @@ void measure(char* buffer, int sensor_type, int number)
     buffer[DATE_LENGTH]=buffer[DATE_LENGTH] | ((uint8_t)number);
 
     //zapis do bufora wygenerowanej wartości zmierzonej (bajty 9-13 bufora)
-    writeMeasurement(buffer, sensor_type, 10.0, 1.0);
+    if(sensor_type ==0)
+    writeMeasurement(buffer, sensor_type, 20.0, 1.0);
+    else
+    writeMeasurement(buffer, sensor_type, 70.0, 1.0);
 }
 
 void disp_buffer(char* buffer) //można by to lepiej napisać

@@ -1,4 +1,6 @@
-//Autor: Magdalena Zych
+//sensors.c
+//Autorzy: Magdalena Zych
+//	   Maria Jarek
 //Data: 22.04.2020
 
 #include "sensors.h"

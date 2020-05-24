@@ -1,3 +1,4 @@
+//parameters.c
 //Autor: Magdalena Zych
 //Data: 10.05.2020
 

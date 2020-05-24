@@ -1,3 +1,4 @@
+//server.c
 //Autorzy: Magdalena Zych
 //	   Dorota Wojciechowicz
 //Data: 22.04.2020
@@ -5,7 +6,9 @@
 #include "server.h"
 
 int received_packets=0;
+int received_wrong_packets=0;
 pthread_mutex_t mutex_received_packets=PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t mutex_received_wrong_packets=PTHREAD_MUTEX_INITIALIZER;
 
 int main()
 {
@@ -76,7 +79,25 @@ int main()
 	char date[85];
 	char hour[30];
 	int sensor_type = (buffer[DATE_LENGTH]&192)>>6;
+	if (sensor_type==3)
+	{
+	     pthread_mutex_lock(&mutex_received_wrong_packets);
+	     ++received_wrong_packets;
+	     pthread_mutex_unlock(&mutex_received_wrong_packets);
+	     printf( "sensor_type ERROR\n" );
+	     continue;
+	     //exit( 5 );
+	}
 	int sensor_nr = buffer[DATE_LENGTH]&63;
+	if(sensor_nr<0 || sensor_nr>63)
+	{
+	     pthread_mutex_lock(&mutex_received_wrong_packets);
+	     ++received_wrong_packets;
+	     pthread_mutex_unlock(&mutex_received_wrong_packets);
+	     printf( "sensor_nr ERROR\n" );
+	     continue;
+	    // exit( 6 );
+	}
 	union bytesInterpretation measurement;
 	measurement.intValue = 0;
 
@@ -86,11 +107,28 @@ int main()
 	{
 	     measurement.intValue=measurement.intValue+((int)(buffer[i+DATE_LENGTH+1]&INITIAL_MASK)<<(8*i));
 	}
-
+	if(sensor_nr == 0 && (measurement.floatValue<-50.0 || measurement.floatValue>80.0))
+	{
+	     pthread_mutex_lock(&mutex_received_wrong_packets);
+	     ++received_wrong_packets;
+	     pthread_mutex_unlock(&mutex_received_wrong_packets);
+	     printf( "measurement_range 1 ERROR\n" );
+	     continue;
+	    // exit( 7 );
+	}
+	else if (measurement.floatValue<0.0 || measurement.floatValue>100.0)
+	{
+	     pthread_mutex_lock(&mutex_received_wrong_packets);
+	     ++received_wrong_packets;
+	     pthread_mutex_unlock(&mutex_received_wrong_packets);
+	     printf( "measurement_range ERROR\n" );
+	     continue;
+	   //  exit( 7 );
+	}
 	if((file=fopen(date,"a"))==NULL)
 	{
 	     perror( "fopen() ERROR" );
-	     exit( 5 );
+	     exit( 8 );
 	}
 	fprintf(file,"%s ", hour);
 	fprintf(file,"Typ czujnika: %d nr.%d ", sensor_type,sensor_nr);

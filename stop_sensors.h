@@ -1,3 +1,4 @@
+//stop_sensors.h
 //Autor: Magdalena Zych
 //Data: 11.05.2020
 

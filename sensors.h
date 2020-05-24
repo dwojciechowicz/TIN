@@ -1,3 +1,4 @@
+//sensors.h
 //Autor: Maria Jarek
 //        Magdalena Zych
 //Data: 06.05.2020
