@@ -3,7 +3,7 @@
 
 CC=gcc
 
-all: server sensors stop_sensors diagnostics change_param
+all: server sensors control_mod
 
 server: server.c parameters.c
 		$(CC) server.c parameters.c -o server -lpthread
@@ -11,11 +11,5 @@ server: server.c parameters.c
 sensors: normalDistribution.c sensor_function.c sensors.c parameters.c
 		$(CC) normalDistribution.c sensor_function.c sensors.c parameters.c -o sensors -lpthread -lm
 
-stop_sensors: stop_sensors.c parameters.c
-		$(CC) stop_sensors.c parameters.c -o stop_sensors
-
-diagnostics: diagnostics.c parameters.c
-		$(CC) diagnostics.c parameters.c -o diagnostics
-
-change_param: change_param.c parameters.c
-		$(CC) change_param.c parameters.c -o change_param
+control_mod: control_mod.c parameters.c
+		$(CC) control_mod.c parameters.c -o control_mod
