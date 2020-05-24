@@ -26,7 +26,7 @@ void* sensor(void* param)
     }
 
     char buffer[BUFFER_SIZE]="";
-    struct sensor_parametres* parametres=(struct sensor_parametres *)param;
+    struct sensor_parameters* parameters=(struct sensor_parameters *)param;
     srand(time(NULL));
     int r=0; // liczba pomocna przy "wysyłaniu" pakietów błędnych, lub tych co nie dotrą
     int i=0;
@@ -34,7 +34,7 @@ void* sensor(void* param)
     while(1) //zatrzymanie działania sensorów poprzez "./stop_sensors"
     {
         ++i;
-        measure(buffer, parametres->type, parametres->device_number);
+        measure(buffer, parameters->type, parameters->device_number);
         printf( "|Message nr %d for server|: ", i);
         disp_buffer(buffer);
         socklen_t len = sizeof( serwer );
@@ -45,8 +45,8 @@ void* sensor(void* param)
 	{
 	if (r==3)
 	{
-	stare = parametres->type;
-	parametres->type = 3;
+	stare = parameters->type;
+	parameters->type = 3;
 	}
 	if( sendto( socket_, &buffer, sizeof(buffer), 0,( struct sockaddr * ) & serwer, len ) < 0 )
         {
@@ -55,13 +55,13 @@ void* sensor(void* param)
         }
 	if (r==3)
 	{
-	parametres->type = stare;
+	parameters->type = stare;
 	}
 	}
         pthread_mutex_lock(&mutex_sent_packets);
         ++sent_packets;
         pthread_mutex_unlock(&mutex_sent_packets);
-        sleep(parametres->sleep_time);
+        sleep(parameters->sleep_time);
       }
     shutdown( socket_, SHUT_RDWR );
 }

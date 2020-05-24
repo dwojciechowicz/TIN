@@ -35,7 +35,7 @@ void measure(char* buffer, int sensor_type, int number); //przygotowanie pomiaru
 void disp_buffer(char* buffer);
 void writeDate(char* buffer);
 void writeMeasurement(char* buffer, int sensor_type, float mean, float std);
-struct sensor_parametres
+struct sensor_parameters
 {
   int type; //typ czujnika (TEMP_POW, WILG_POW, WILG_GL)
   int device_number;
