@@ -10,7 +10,8 @@
 #include <sys/socket.h>
 #include <stdint.h>
 #include <pthread.h>
-
+#include <stdbool.h>
+#include "socket_preparation.h"
 #include "normalDistribution.h"
 
 #define PERIOD 2 //czas (w sekundach) między kolejnyi pomiarami

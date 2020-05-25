@@ -3,14 +3,11 @@
 //	   Dorota Wojciechowicz
 //Data: 25.05.2020
 
-#include <stdio.h>
-#include <stdlib.h> // exit()
 #include <string.h> // memset()
 #include <time.h> //localtime()
-#include <arpa/inet.h> // inet_pton()
-#include <sys/socket.h>
 #include "parameters.h"
 #include <pthread.h>
+#include "socket_preparation.h"
 
 #define INITIAL_MASK 255
 #define DATE_LENGTH 8 //liczba bajtów na których zapisywana jest data i godzina

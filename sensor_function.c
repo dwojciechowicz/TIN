@@ -7,56 +7,40 @@
 
 void* sensor(void* param)
 {
-    struct sockaddr_in serwer =
-    {
-        .sin_family = AF_INET,
-        .sin_port = htons( server_port )
-    };
-    if( inet_pton( AF_INET, server_ip, & serwer.sin_addr ) <= 0 )
-    {
-        printf( "ERROR-inet_pton() \n" );
-        exit( 1 );
-    }
-
-    const int socket_ = socket( AF_INET, SOCK_DGRAM, IPPROTO_UDPLITE );
-    if( socket_ < 0 )
-    {
-        printf( "ERROR-socket() \n" );
-        exit( 1 );
-    }
+    struct sockaddr_in serwer;
+    const int socket_=prepare_socket(server_port, server_ip, true, &serwer);
 
     char buffer[BUFFER_SIZE]="";
     struct sensor_parameters* parameters=(struct sensor_parameters *)param;
     srand(time(NULL));
     int r=0; // liczba pomocna przy "wysyłaniu" pakietów błędnych, lub tych co nie dotrą
     int i=0;
-    //for(i=1; i<4; i++) //liczba pomiarów każdego czujnika - docelowo tu będzie while(1)
     while(1) //zatrzymanie działania sensorów poprzez "./stop_sensors"
     {
        	++i;
-	r = (int) rand()/(RAND_MAX+1.0)*100.0;
-	int stare;
-	if(r!=1)//zgubione pakiety
-	{
-	if (r==3)//pakiety bledne
-	{
-	stare = parameters->type;
-	parameters->type =3;
-	}
+      	r = (int) rand()/(RAND_MAX+1.0)*100.0;
+      	int stare;
+      	if(r!=1)//zgubione pakiety
+      	{
+      	if (r==3)//pakiety bledne
+      	{
+        	stare = parameters->type;
+        	parameters->type =3;
+      	}
         measure(buffer, parameters->type, parameters->device_number);
         printf( "|Message nr %d for server|: ", i);
         disp_buffer(buffer);
         socklen_t len = sizeof( serwer );
-	if( sendto( socket_, &buffer, sizeof(buffer), 0,( struct sockaddr * ) & serwer, len ) < 0 )
-        {
-            perror( "ERROR-sendto() \n" );
-            exit( 1 );
-        }
-	if (r==3)
-	{
-	parameters->type =stare;
-	}
-	}
+      	if( sendto( socket_, &buffer, sizeof(buffer), 0,( struct sockaddr * ) & serwer, len ) < 0 )
+              {
+                  perror( "ERROR-sendto() \n" );
+                  exit( 1 );
+              }
+      	if (r==3)
+      	{
+      	   parameters->type =stare;
+      	}
+      	}
         pthread_mutex_lock(&mutex_sent_packets);
         ++sent_packets;
         pthread_mutex_unlock(&mutex_sent_packets);
