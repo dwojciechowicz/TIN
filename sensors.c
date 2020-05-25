@@ -10,7 +10,7 @@ int server_port;
 
 int main(int argc, char *argv[])
 {
-  if(argc < SENSOR_TYPES_NUMBER+1) //zrobic jakis krótszy komunikat
+  if(argc < SENSOR_TYPES_NUMBER+1)
   {
     printf("Poprawne wywolanie funkcji: ./sensors <liczba czujnikow mierzacych temperature powietrza>");
     printf("<liczba czujnikow mierzacych wilgotnosc powietrza> <liczba czujnikow mierzacych wilgotnosc gleby>\n");
@@ -30,6 +30,7 @@ int main(int argc, char *argv[])
 
   for(int i=0;i<SENSOR_TYPES_NUMBER;++i)
   {
+      sensors_numbers[i]=atoi(argv[i+1]);
       sensor_threads[i]=(pthread_t *)malloc(atoi(argv[i+1])*sizeof(pthread_t));
       parameters[i]=(struct sensor_parameters *)malloc(atoi(argv[i+1])*sizeof(struct sensor_parameters));
   }
@@ -89,4 +90,3 @@ int main(int argc, char *argv[])
 
   return 0;
 }
-

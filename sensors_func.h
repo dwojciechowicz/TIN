@@ -13,6 +13,7 @@
 #include "parameters.h"
 
 struct sensor_parameters **parameters;
+int sensors_numbers[SENSOR_TYPES_NUMBER]; // liczba czujnkow danego typu
 
 struct sensor_threads_info
 {
@@ -29,4 +30,4 @@ union intInBuffer  //unia potrzebna do zapisania liczby typu int do bufora
 bool check_sensors_arguments(char *arguments[]);
 void* diag_server_func(void* arg);
 bool check_param_communication(char str[]);
-void set_new_sleep_time(char action[]);
+bool set_new_sleep_time(char action[]);

@@ -4,8 +4,11 @@
 
 #include "parameters.h"
 
-int get_server_parameters(char *ip, int* port, int server_nr)
+bool get_server_parameters(char *ip, int* port, int server_nr)
 {
+  if(server_nr > SERVERS_NR)
+    return false;
+
   FILE *file;
   if((file=fopen("parameters.txt","r"))==NULL)
   {
@@ -18,4 +21,5 @@ int get_server_parameters(char *ip, int* port, int server_nr)
     fscanf(file, "%d", port);
   }
   fclose(file);
+  return true;
 }

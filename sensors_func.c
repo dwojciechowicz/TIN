@@ -117,7 +117,26 @@ void* diag_server_func(void* param)
       }
       else if(check_param_communication(action)) //czy odebrany komunikat dotyczy zmiany okresu pomiarow
       {
-        set_new_sleep_time(action);
+        if(set_new_sleep_time(action))
+        {
+          //odpowiedz ze udalo sie zmienic parametr
+          char buffer[5]="OK";
+          if( sendto( socket_, buffer, strlen( buffer ), 0,( struct sockaddr * ) & client, server_size ) < 0 )
+          {
+              perror( "sendto() ERROR" );
+              exit( 5 );
+          }
+        }
+        else
+        {
+          //odpowiedź że nie udało się zienic parametru
+          char buffer[5]="ERR";
+          if( sendto( socket_, buffer, strlen( buffer ), 0,( struct sockaddr * ) & client, server_size ) < 0 )
+          {
+              perror( "sendto() ERROR" );
+              exit( 5 );
+          }
+        }
       }
   }
 }
@@ -134,7 +153,7 @@ bool check_param_communication(char str[])
 	return false;
 }
 
-void set_new_sleep_time(char action[])
+bool set_new_sleep_time(char action[])
 {
   const char s[2] = " ";
   char *token;
@@ -153,5 +172,12 @@ void set_new_sleep_time(char action[])
   int j = atoi(new_params[1]);  //nr_id_czujnika
   int new_period = atoi(new_params[2]); //nowy okres wysylania pomiarow
 
+  if(i<0 || i>SENSOR_TYPES_NUMBER-1)
+    return false; // nieistniejacy typ czujnika
+
+  if(j<0 || j>=sensors_numbers[i])
+    return false;
+
   parameters[i][j].sleep_time = new_period;
+  return true;
 }

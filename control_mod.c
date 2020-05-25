@@ -91,7 +91,7 @@ int main(int argc, char *argv[])
           if(strcmp(buffer, "OK")==0)
             printf( "Udalo sie wylaczyc wszystkie czujniki\n");
           else
-            printf( "stop_sensors() ERROR\n");
+            printf( "Wystapil blad przy probie wylaczenia czujnikow\n");
           break;
 
       case 1:
@@ -156,6 +156,17 @@ int main(int argc, char *argv[])
         break;
 
       case 2:
+        //odpowiedz
+        memset( buffer, 0, sizeof( buffer ) );
+        if( recvfrom( socket_, buffer, sizeof( buffer ), 0,( struct sockaddr * ) & from, & sensors_serv_size ) < 0 )
+        {
+            perror( "recvfrom() ERROR" );
+            exit( 1 );
+        }
+        if(strcmp(buffer, "OK")==0)
+          printf( "Udalo sie zmienic parametr czujnika\n");
+        else
+          printf( "Wystapil blad przy probie zmiany parametru czujnika\n");
         break;
 
       default:
@@ -167,5 +178,3 @@ int main(int argc, char *argv[])
     shutdown( socket_, SHUT_RDWR );
 
   }
-
-

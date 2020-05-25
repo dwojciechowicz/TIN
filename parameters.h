@@ -4,5 +4,8 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
 
-int get_server_parameters(char *ip, int* port, int server_nr);
+#define SERVERS_NR 3 //liczba serwerow o ktorych informacja przechowywana jest w pliku parameters.txt
+
+bool get_server_parameters(char *ip, int* port, int server_nr);
