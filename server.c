@@ -189,6 +189,7 @@ void* diag_server_func(void* param)
         union intInBuffer int_buffer;
  	uint32_t mask_32 = 255;
 	uint32_t current_byte_32 = 0;
+
 	pthread_mutex_lock(&mutex_received_packets);
         int dobre = received_packets;
         pthread_mutex_unlock(&mutex_received_packets);
@@ -197,21 +198,22 @@ void* diag_server_func(void* param)
         int zle = received_wrong_packets;
         pthread_mutex_unlock(&mutex_received_wrong_packets);
 
-	for(int i = 0; i < 4; ++i)
+	for(int i = 0; i < 4; ++i)//zapis lacznej liczby odebranych komunikatow
 	{
-	current_byte_32=((received_packets & mask_32)>>(8*i));
+	current_byte_32=((dobre & mask_32)>>(8*i));
 	int_buffer.buffer[i]=(uint8_t)current_byte_32;
 	mask_32=mask_32<<8;
         }
 
-	for(int i = 4; i < 8; ++i)
+	mask_32=255;
+	for(int i = 4; i < 8; ++i)//zapis liczny blednych komunikatow
 	{
-	current_byte_32=((received_wrong_packets & mask_32)>>(8*i));
+	current_byte_32=((zle & mask_32)>>(8*(i-4)));
 	int_buffer.buffer[i]=(uint8_t)current_byte_32;
 	mask_32=mask_32<<8;
         }
 
-        if( sendto( socket_, int_buffer.buffer, strlen( int_buffer.buffer ), 0,( struct sockaddr * ) & client, server_size ) < 0 )
+        if( sendto( socket_, int_buffer.buffer, sizeof( int_buffer.buffer ), 0,( struct sockaddr * ) & client, server_size ) < 0 )
         {
             perror( "sendto() ERROR" );
             exit( 5 );

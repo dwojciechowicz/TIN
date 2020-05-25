@@ -91,7 +91,7 @@ int main(int argc, char *argv[])
           if(strcmp(buffer, "OK")==0)
             printf( "Udalo sie wylaczyc wszystkie czujniki\n");
           else
-            printf( "Wystapil blad przy probie wylaczenia czujnikow\n");
+            printf( "stop_sensors() ERROR\n");
           break;
 
       case 1:
@@ -143,30 +143,20 @@ int main(int argc, char *argv[])
           }
 	  int wrong=0;
 	  int good=0;
-	  for(int i=0; i<4; ++i)
+	  for(int i=0; i<4; ++i)//odczyt lacznej liczby odebranych komunikatow
 	  {
-	     good=good+((int)(int_buffer.buffer[i]&255)<<(8*i));
+	     good=good+((int)(int_buffer.buffer[i] &255)<<(8*i));
 	  }
- 	  for(int i=4; i<8; ++i)
+
+ 	  for(int i=4; i<8; ++i)//odczyt liczby blednych komunikatow
 	  {
-	     wrong=wrong+((int)(int_buffer.buffer[i]&255)<<(8*i));
+	     wrong=wrong+((int)(int_buffer.buffer[i]&255)<<(8*(i-4)));
 	  }
-          printf( "Liczba odebranych pomiarow: %d\n", good);
+          printf( "Liczba odebranych pomiarów: %d\n", good);
           printf( "Liczba odebranych błędnych pakietów: %d\n", wrong);
         break;
 
       case 2:
-        //odpowiedz
-        memset( buffer, 0, sizeof( buffer ) );
-        if( recvfrom( socket_, buffer, sizeof( buffer ), 0,( struct sockaddr * ) & from, & sensors_serv_size ) < 0 )
-        {
-            perror( "recvfrom() ERROR" );
-            exit( 1 );
-        }
-        if(strcmp(buffer, "OK")==0)
-          printf( "Udalo sie zmienic parametr czujnika\n");
-        else
-          printf( "Wystapil blad przy probie zmiany parametru czujnika\n");
         break;
 
       default:
@@ -178,3 +168,5 @@ int main(int argc, char *argv[])
     shutdown( socket_, SHUT_RDWR );
 
   }
+
+

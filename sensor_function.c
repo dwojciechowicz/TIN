@@ -33,21 +33,29 @@ void* sensor(void* param)
     //for(i=1; i<4; i++) //liczba pomiarów każdego czujnika - docelowo tu będzie while(1)
     while(1) //zatrzymanie działania sensorów poprzez "./stop_sensors"
     {
-        ++i;
+       	++i;
+	r = (int) rand()/(RAND_MAX+1.0)*100.0;
+	int stare;
+	if(r!=1)//zgubione pakiety
+	{
+	if (r==3)//pakiety bledne
+	{
+	stare = parameters->type;
+	parameters->type =3;
+	}
         measure(buffer, parameters->type, parameters->device_number);
         printf( "|Message nr %d for server|: ", i);
         disp_buffer(buffer);
         socklen_t len = sizeof( serwer );
-	r = (int) rand()/(RAND_MAX+1.0)*100.0;
-	printf("%d\n",r);
-	int stare;
-	if(r!=1)
-	{
 	if( sendto( socket_, &buffer, sizeof(buffer), 0,( struct sockaddr * ) & serwer, len ) < 0 )
         {
             perror( "ERROR-sendto() \n" );
             exit( 1 );
         }
+	if (r==3)
+	{
+	parameters->type =stare;
+	}
 	}
         pthread_mutex_lock(&mutex_sent_packets);
         ++sent_packets;
