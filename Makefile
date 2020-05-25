@@ -7,8 +7,8 @@ CC=gcc
 
 all: server sensors control_mod testowanie
 
-server: server.c parameters.c
-		$(CC) server.c parameters.c -o server -lpthread -D_REENTRANT
+server: server.c parameters.c server_func.c
+		$(CC) server.c parameters.c server_func.c -o server -lpthread -D_REENTRANT
 
 sensors: normalDistribution.c sensor_function.c sensors.c sensors_func.c parameters.c
 		$(CC) normalDistribution.c sensor_function.c sensors.c sensors_func.c parameters.c -o sensors -lpthread -D_REENTRANT -lm
