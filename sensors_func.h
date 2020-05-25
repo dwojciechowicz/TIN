@@ -21,11 +21,6 @@ struct sensor_threads_info
   int sensors_nr[SENSOR_TYPES_NUMBER];
 };
 
-union intInBuffer  //unia potrzebna do zapisania liczby typu int do bufora
-{
-  int intValue;
-  char buffer[5];
-};
 
 bool check_sensors_arguments(char *arguments[]);
 void* diag_server_func(void* arg);

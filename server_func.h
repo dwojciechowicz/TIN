@@ -28,9 +28,3 @@ union bytesInterpretation  //unia potrzebna do wykonywania operacji logicznych n
   float floatValue;
   int intValue;
 };
-
-union intInBuffer  //unia potrzebna do interpretacji liczby typu int z bufora
-{
-  uint64_t intValue;
-  char buffer[8];
-};

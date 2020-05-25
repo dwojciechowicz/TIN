@@ -102,7 +102,7 @@ int main(int argc, char *argv[])
               perror( "recvfrom() ERROR" );
               exit( 1 );
           }
-          printf( "Liczba wyslanych pomiarow: %ld\n", int_buffer.intValue);
+          printf( "Liczba wyslanych pomiarow: %d\n", int_buffer.intValue);
           shutdown( socket_, SHUT_RDWR );
 
           //wyslanie zapytania do modułu odbierającego pomiary (serwera)
