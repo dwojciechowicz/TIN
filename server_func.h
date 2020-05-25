@@ -15,7 +15,7 @@
 
 const int prepare_server(socklen_t *len_addr, int server_port, char* server_ip, bool udplite, struct sockaddr_in * serwer);
 void process_packet(char *buffer, FILE *file, struct sockaddr_in client);
-void get_packet(const int *socket_addr, FILE *file, socklen_t *len_addr);
+void get_packet(const int *socket_addr, FILE *file, socklen_t *len_addr, pthread_t diag_server_thread);
 void send_diag(const int socket_, struct sockaddr_in *client, socklen_t len);
 void get_diag_packet(const int *socket_addr, socklen_t *len_addr);
 void* diag_server_func(void* arg);

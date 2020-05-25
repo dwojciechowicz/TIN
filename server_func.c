@@ -5,9 +5,10 @@
 
 #include "server_func.h"
 
-
+bool stop=false; //parametr oznaczajacy czy nalezy zatrzymac serwery
 int received_packets=0;
 int received_wrong_packets=0;
+pthread_mutex_t mutex_stop=PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t mutex_received_packets=PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t mutex_received_wrong_packets=PTHREAD_MUTEX_INITIALIZER;
 
@@ -88,7 +89,7 @@ void process_packet(char *buffer, FILE *file, struct sockaddr_in client)
     printf( "|Client ip: %s port: %d|\n", inet_ntop( AF_INET, & client.sin_addr, buffer_ip, sizeof( buffer_ip ) ), ntohs( client.sin_port ) );
 }
 
-void get_packet(const int *socket_addr, FILE *file, socklen_t *len_addr)
+void get_packet(const int *socket_addr, FILE *file, socklen_t *len_addr, pthread_t diag_server_thread)
 {
     socklen_t len=*len_addr;
     const int socket_=*socket_addr;
@@ -103,6 +104,22 @@ void get_packet(const int *socket_addr, FILE *file, socklen_t *len_addr)
         perror( "recvfrom() ERROR" );
         exit( 4 );
     }
+
+    pthread_mutex_lock(&mutex_stop);
+    if(stop) //nalezy zatrzymac serwer
+    {
+      pthread_join(diag_server_thread, NULL);
+      printf("Wylaczanie glownego serwera\n");
+      char buffer[5]="OK";
+      // wyslanie potwierdzenia
+      if( sendto( socket_, buffer, sizeof( buffer ), 0,( struct sockaddr * ) &client, len ) < 0 )
+      {
+          perror( "sendto() ERROR" );
+          exit( 5 );
+      }
+      pthread_exit(NULL);
+    }
+    pthread_mutex_unlock(&mutex_stop);
 
     process_packet(buffer, file, client);
 }
@@ -161,6 +178,21 @@ void get_diag_packet(const int *socket_addr, socklen_t *len_addr)
   if(strcmp(action, "diag")==0) //diagnostyka
   {
       send_diag(socket_, &client, len);
+  }
+  else if(strcmp(action, "stop")==0) //zatrzymywanie serwera
+  {
+    printf("Wylaczenie serwera diagnostycznego\n");
+    pthread_mutex_lock(&mutex_stop);
+    stop=true;
+    pthread_mutex_unlock(&mutex_stop);
+    char buffer[5]="OK";
+    // wyslanie potwierdzenia
+    if( sendto( socket_, buffer, sizeof( buffer ), 0,( struct sockaddr * ) &client, len ) < 0 )
+    {
+        perror( "sendto() ERROR" );
+        exit( 5 );
+    }
+    pthread_exit(NULL);
   }
 }
 

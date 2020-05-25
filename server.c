@@ -24,7 +24,7 @@ int main()
 
     while( 1 )
     {
-        get_packet(&socket_, file, &len);
+        get_packet(&socket_, file, &len, diag_server_thread);
     }
 
     shutdown( socket_, SHUT_RDWR );
