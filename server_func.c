@@ -11,15 +11,12 @@ int received_wrong_packets=0;
 pthread_mutex_t mutex_received_packets=PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t mutex_received_wrong_packets=PTHREAD_MUTEX_INITIALIZER;
 
-const int prepare_server(socklen_t *len_addr, int server_port, char* server_ip, bool udplite)
+const int prepare_server(socklen_t *len_addr, int server_port, char* server_ip, bool udplite, struct sockaddr_in * serwer)
 {
-    struct sockaddr_in serwer =
-    {
-        .sin_family = AF_INET,
-        .sin_port = htons( server_port )
-    };
+    serwer->sin_family = AF_INET;
+    serwer->sin_port = htons( server_port );
 
-    if( inet_pton( AF_INET, server_ip, & serwer.sin_addr ) <= 0 )
+    if( inet_pton( AF_INET, server_ip, &(serwer->sin_addr) ) <= 0 )
     {
         perror( "inet_pton() ERROR" );
         exit( 1 );
@@ -42,8 +39,8 @@ const int prepare_server(socklen_t *len_addr, int server_port, char* server_ip, 
         exit( 2 );
     }
 
-    *len_addr = sizeof( serwer );
-    if( bind( socket_,( struct sockaddr * ) & serwer, *len_addr ) < 0 )
+    *len_addr = sizeof( *serwer );
+    if( bind( socket_,( struct sockaddr * ) serwer, *len_addr ) < 0 )
     {
         perror( "bind() ERROR" );
         exit( 3 );
@@ -210,7 +207,10 @@ void* diag_server_func(void* param)
   int server_port;
   get_server_parameters(server_ip, &server_port, 2);
   socklen_t len;
-  const int socket_=prepare_server(&len, server_port, server_ip, false);
+
+  struct sockaddr_in server;
+
+  const int socket_=prepare_server(&len, server_port, server_ip, false, &server);
 
   while( 1 )
   {

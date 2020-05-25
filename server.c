@@ -19,7 +19,8 @@ int main()
     FILE * file;
     socklen_t len;
 
-    const int socket_=prepare_server(&len, server_port, server_ip, true);
+    struct sockaddr_in serwer;
+    const int socket_=prepare_server(&len, server_port, server_ip, true, &serwer);
 
     while( 1 )
     {
