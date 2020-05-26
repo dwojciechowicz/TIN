@@ -6,7 +6,7 @@
 
 bool get_server_parameters(char *ip, int* port, int server_nr)
 {
-  if(server_nr > SERVERS_NR)
+  if(server_nr > SERVERS_NR || server_nr <= 0)
     return false;
 
   FILE *file;

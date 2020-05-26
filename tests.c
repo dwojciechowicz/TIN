@@ -67,11 +67,14 @@ void test_check_param_com()
 	CU_ASSERT_FALSE(check_param_communication("abcpara"));
 }
 
-// void test_get_server_parameters()
-// {
-// 	CU_ASSERT_TRUE(get_server_parameters());
-// 	CU_ASSERT_FALSE(get_server_parameters());
-// }
+void test_get_server_parameters()
+{
+	char server_ip[20];
+	int server_port;
+	CU_ASSERT_TRUE(get_server_parameters(server_ip, &server_port, 1));
+	CU_ASSERT_FALSE(get_server_parameters(server_ip, &server_port, 4));
+	CU_ASSERT_FALSE(get_server_parameters(server_ip, &server_port, -8));
+}
 
 void testuj()
 {
@@ -86,7 +89,7 @@ void testuj()
 	CU_add_test(pSuite, "test_identify_action", test_identify_action);
 	CU_add_test(pSuite, "test_load_params", test_load_params);
 	CU_add_test(pSuite, "test_check_param_com", test_check_param_com);
-	// CU_add_test(pSuite, "test_get_server_parameters", test_get_server_parameters);
+	CU_add_test(pSuite, "test_get_server_parameters", test_get_server_parameters);
 	
 	// uruchomienie wszystkich testow
 	CU_basic_run_tests();
