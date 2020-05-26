@@ -79,11 +79,11 @@ void process_packet(char *buffer, FILE *file, struct sockaddr_in client)
          exit( 8 );
     }
     fprintf(file,"%s ", hour);
-    fprintf(file,"Typ czujnika: %d nr.%d ", sensor_type,sensor_nr);
-    if(sensor_nr == 0)
-        { fprintf(file,"Pomiar: %.3f\n", measurement.floatValue);}
-    else
+    fprintf(file,"Typ czujnika: %d nr %d ", sensor_type,sensor_nr);
+    if(sensor_type == 0)
         { fprintf(file,"Pomiar: %.2f\n", measurement.floatValue);}
+    else
+        { fprintf(file,"Pomiar: %.3f\n", measurement.floatValue);}
     fclose(file);
     char buffer_ip[ 128 ] = { };
     printf( "|Client ip: %s port: %d|\n", inet_ntop( AF_INET, & client.sin_addr, buffer_ip, sizeof( buffer_ip ) ), ntohs( client.sin_port ) );

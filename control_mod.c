@@ -16,7 +16,7 @@ int main(int argc, char *argv[])
 
     // interpretuje podane polecenie
     int action_type; // 0 - stop, 1-diag, 2 - para -> docelowo typ enum
-    identify_action(argc, argv, &action_type);
+    if( !identify_action(argc, argv, &action_type) ) exit( 1 );
 
     char action[15] = { };
 

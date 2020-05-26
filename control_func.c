@@ -6,26 +6,26 @@
 #include "control_func.h"
 
 
-  void identify_action(int argc, char *argv[], int *action_type)
+  bool identify_action(int argc, char *argv[], int *action_type)
   {
     if( (strstr(argv[1], "para") == argv[1]) && (argv[1][4] == '\0') )
   	{
   		*action_type = 2;
-      return;
+      return true;
   	}
     if( (strstr(argv[1], "diag") == argv[1]) && (argv[1][4] == '\0') )
   	{
   		*action_type = 1;
-      return;
+      return true;
   	}
     if((strstr(argv[1], "stop") == argv[1]) && (argv[1][4] == '\0') )
   	{
   		*action_type = 0;
-      return;
+      return true;
   	}
 
     printf("Podano błędny argument wywołania. Prawidłowe wywołania:\n\t./control_mod diag\n\t./control_mod stop\n\t./control_mod para typ nr czas\n");
-    exit( 1 );
+    return false;
   }
 
 

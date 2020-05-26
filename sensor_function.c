@@ -22,31 +22,34 @@ void* sensor(void* param)
       	int stare;
       	if(r!=1)//zgubione pakiety
       	{
-      	if (r==3)//pakiety bledne
-      	{
-        	stare = parameters->type;
-        	parameters->type =3;
-      	}
-        measure(buffer, parameters->type, parameters->device_number);
-        printf( "|Message nr %d for server|: ", i);
-        disp_buffer(buffer);
-        socklen_t len = sizeof( serwer );
-      	if( sendto( socket_, &buffer, sizeof(buffer), 0,( struct sockaddr * ) & serwer, len ) < 0 )
-              {
-                  perror( "ERROR-sendto() \n" );
-                  exit( 1 );
-              }
-      	if (r==3)
-      	{
-      	   parameters->type =stare;
-      	}
+        	if (r==3)//pakiety bledne
+        	{
+          	stare = parameters->type;
+          	parameters->type =3;
+        	}
+          measure(buffer, parameters->type, parameters->device_number);
+
+          socklen_t len = sizeof( serwer );
+        	if( sendto( socket_, &buffer, sizeof(buffer), 0,( struct sockaddr * ) & serwer, len ) < 0 )
+          {
+              perror( "ERROR-sendto() \n" );
+              exit( 1 );
+          }
+
+          printf( "|Message nr %d for server|: ", i);
+          disp_buffer(buffer);
+
+        	if (r==3)
+        	{
+        	   parameters->type =stare;
+        	}
       	}
         pthread_mutex_lock(&mutex_sent_packets);
         ++sent_packets;
         pthread_mutex_unlock(&mutex_sent_packets);
         sleep(parameters->sleep_time);
       }
-    shutdown( socket_, SHUT_RDWR );
+      shutdown( socket_, SHUT_RDWR );
 }
 
 void measure(char* buffer, int sensor_type, int number)
