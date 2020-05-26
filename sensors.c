@@ -1,45 +1,60 @@
-//Autor: Magdalena Zych
+//sensors.c
+//Autorzy: Magdalena Zych
+//	   Maria Jarek
 //Data: 22.04.2020
 
-#include "sensors.h"
+#include "sensors_func.h"
+
+char server_ip[20];
+int server_port;
 
 int main(int argc, char *argv[])
 {
-  if(argc < SENSOR_TYPES_NUMBER+1) //zrobic jakis krótszy komunikat
+  if(argc != SENSOR_TYPES_NUMBER+1)
   {
     printf("Poprawne wywolanie funkcji: ./sensors <liczba czujnikow mierzacych temperature powietrza>");
     printf("<liczba czujnikow mierzacych wilgotnosc powietrza> <liczba czujnikow mierzacych wilgotnosc gleby>\n");
     return 1;
   }
-
-  if(!check_arguments(argv)) return 2;
+  //wczytywanie z pliku parameters.txt adresu ip oraz portu
+  get_server_parameters(server_ip, &server_port, 1);
+  if(!check_sensors_arguments(argv)) return 2;
 
   srand(time(NULL)); //dalej wykorzystywana bedzie funkcja rand()
-  //sensor_threads - table with thread reference variables
-  //parametres - table with structures of sensors' parametres
+  //sensor_threads - tablica zmiennych referencyjnych watkow
+  //parameters - tablica parametrow czujnikow
   pthread_t **sensor_threads=(pthread_t **)malloc(SENSOR_TYPES_NUMBER*sizeof(pthread_t *));
-  struct sensor_parametres **parametres=(struct sensor_parametres **)malloc(SENSOR_TYPES_NUMBER*sizeof(struct sensor_parametres *));
+  parameters=(struct sensor_parameters **)malloc(SENSOR_TYPES_NUMBER*sizeof(struct sensor_parameters *));
+  struct sensor_threads_info threads_info;
+  threads_info.threads_table_ptr=sensor_threads;
 
   for(int i=0;i<SENSOR_TYPES_NUMBER;++i)
   {
+      sensors_numbers[i]=atoi(argv[i+1]);
       sensor_threads[i]=(pthread_t *)malloc(atoi(argv[i+1])*sizeof(pthread_t));
-      parametres[i]=(struct sensor_parametres *)malloc(atoi(argv[i+1])*sizeof(struct sensor_parametres));
+      parameters[i]=(struct sensor_parameters *)malloc(atoi(argv[i+1])*sizeof(struct sensor_parameters));
   }
-
   for(int i=0;i<SENSOR_TYPES_NUMBER;++i)
   {
+    threads_info.sensors_nr[i]=atoi(argv[i+1]);
+
     for(int j=0;j<atoi(argv[i+1]);++j)
     {
-      //setting sensor sensor_parametres
-      parametres[i][j].type=i;
-      parametres[i][j].device_number=j; //numeracja urządzeń od 0
-      if(pthread_create(*(sensor_threads+i)+j, NULL, sensor, *(parametres+i)+j)) //creating the thread
+      //ustawienie parametrow czujnika (sensor_parameters)
+      parameters[i][j].type=i;
+      parameters[i][j].device_number=j; //numeracja urządzeń od 0
+      parameters[i][j].sleep_time = PERIOD;
+      if(pthread_create(*(sensor_threads+i)+j, NULL, sensor, (void*)(*(parameters+i)+j))) //tworzenie watku
       {
         printf( "Error- pthread_create (i=%d, j=%d)", i, j );
         return 4;
       }
     }
   }
+
+  //wątek z serwerem diagnostyki itp
+  pthread_t diag_server_thread;
+  pthread_create(&diag_server_thread, NULL, diag_server_func, (void *)(&threads_info));
 
   for(int i=0;i<SENSOR_TYPES_NUMBER;++i)
   {
@@ -53,41 +68,25 @@ int main(int argc, char *argv[])
     }
   }
 
+  if(pthread_cancel(diag_server_thread))
+  {
+    printf( "Error- pthread_cancel (diag_server_thread)\n");
+    return(5);
+  }
+  if(pthread_join(diag_server_thread, NULL)) //joining
+  {
+    printf( "Error- pthread_join  (diag_server_thread)");
+    return 5;
+  }
+
   //zwalnianie pamięci
   for(int i=0;i<SENSOR_TYPES_NUMBER;++i)
   {
       free(sensor_threads[i]);
-      free(parametres[i]);
+      free(parameters[i]);
   }
   free(sensor_threads);
-  free(parametres);
+  free(parameters);
 
   return 0;
-}
-
-bool check_arguments(char *arguments[])
-{
-  char *argument;
-  int i, j;
-  for(i=0;i<SENSOR_TYPES_NUMBER;++i)
-  {
-    argument=arguments[i+1];
-    for(int k=0; k<strlen(argument); ++k)
-    {
-      if(!isdigit(argument[k]))
-      {
-        printf("Podany argument nie jest liczba\n");
-        return false;
-      }
-    }
-
-    j = atoi(argument);
-
-    if(j>64 || j<0)
-    {
-        printf("Program przeznaczony na od 0 do max 64 czujników jednego rodzaju\n");
-        return false;
-    }
-   }
-   return true;
 }

@@ -1,3 +1,4 @@
+//normalDistribution.c
 //Autor: Magdalena Zych
 //Data: 25.04.2020
 
