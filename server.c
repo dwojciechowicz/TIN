@@ -5,8 +5,13 @@
 
 #include "server_func.h"
 
-int main()
+int main(int argc, char *argv[])
 {
+    if(argc != 1)
+    {
+      printf("Wywołanie programu nie powinno zawierać żadnych parametrów\n");
+      return -1;
+    }
     //wątek z serwerem diagnostyki
     pthread_t diag_server_thread;
     pthread_create(&diag_server_thread, NULL, diag_server_func, NULL);

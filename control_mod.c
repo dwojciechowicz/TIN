@@ -1,6 +1,7 @@
 //control_mod.c
-//Autorzy: Maria Jarek
-//	 Dorota Wojciechowicz
+//Autorzy: Magdalena Zych
+//         Maria Jarek
+//	       Dorota Wojciechowicz
 //Data: 24.05.2020
 #include "control_mod.h"
 

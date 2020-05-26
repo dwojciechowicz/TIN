@@ -10,7 +10,7 @@ int server_port;
 
 int main(int argc, char *argv[])
 {
-  if(argc < SENSOR_TYPES_NUMBER+1)
+  if(argc != SENSOR_TYPES_NUMBER+1)
   {
     printf("Poprawne wywolanie funkcji: ./sensors <liczba czujnikow mierzacych temperature powietrza>");
     printf("<liczba czujnikow mierzacych wilgotnosc powietrza> <liczba czujnikow mierzacych wilgotnosc gleby>\n");

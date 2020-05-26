@@ -8,21 +8,24 @@
 
   void identify_action(int argc, char *argv[], int *action_type)
   {
-    if(strstr(argv[1], "para") == argv[1])
+    if( (strstr(argv[1], "para") == argv[1]) && (argv[1][4] == '\0') )
   	{
   		*action_type = 2;
       return;
   	}
-    if(strstr(argv[1], "diag") == argv[1])
+    if( (strstr(argv[1], "diag") == argv[1]) && (argv[1][4] == '\0') )
   	{
   		*action_type = 1;
       return;
   	}
-    if(strstr(argv[1], "stop") == argv[1])
+    if((strstr(argv[1], "stop") == argv[1]) && (argv[1][4] == '\0') )
   	{
   		*action_type = 0;
       return;
   	}
+
+    printf("Podano błędny argument wywołania. Prawidłowe wywołania:\n\t./control_mod diag\n\t./control_mod stop\n\t./control_mod para typ nr czas\n");
+    exit( 1 );
   }
 
 
